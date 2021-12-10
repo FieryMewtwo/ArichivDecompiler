@@ -61,14 +61,14 @@ Public Class Form1
     End Sub
 
     ''' <summary>
-    ''' wartet x Millisekunden (GUI-freundlich)
+    ''' time in milliseconds.
     ''' </summary>
     Public Sub WaitOnGUI(ByVal ms As Integer)
-        ' timeout festlegen
+        ' set timeout
         Dim timeOut As Date = Date.Now().AddMilliseconds(ms)
-        ' bis timeout warten
+        ' wait until timeout
         While timeOut > Date.Now
-            Application.DoEvents() ' GUI Ereignisse erlauben
+            Application.DoEvents() ' Allow GUI events
         End While
     End Sub
 
@@ -99,8 +99,8 @@ Public Class Form1
             BackgroundWorker1.RunWorkerAsync()
         Else
 
-            With lvErrors.Items.Add("Der/Die angegebene/n Pfad/e ist/sind Falsch.")
-                .ToolTipText = "Der/Die angegebene/n Pfad/e ist/sind Falsch."
+            With lvErrors.Items.Add("The specified path(s) are incorrect.")
+                .ToolTipText = "The specified path(s) are incorrect."
             End With
         End If
 
@@ -111,7 +111,7 @@ Public Class Form1
         Try
             Dim ZipToUnpack As String = tbFile.Text
             Dim TargetDir As String = tbdestination.Text
-            BeginInvoke(Sub() lvStatus.Items(1).SubItems(1).Text = "Extrahiere Archiv """ & ZipToUnpack & """ zu """ & TargetDir & """")
+            BeginInvoke(Sub() lvStatus.Items(1).SubItems(1).Text = "Extract Archive """ & ZipToUnpack & """ zu """ & TargetDir & """")
             Using zip1 As ZipFile = ZipFile.Read(ZipToUnpack)
                 AddHandler zip1.ExtractProgress, AddressOf MyExtractProgress
 
@@ -125,7 +125,7 @@ Public Class Form1
                     TotalSize += CULng(ent.UncompressedSize)
                 Next
 
-                'if the total size is greater than Integer.MaxValue then divide it down by 1024 before setting the ProgressBar.Maximum
+                'if the total size is greater than Integer.MaxValue then divide it by 1024 before setting the ProgressBar.Maximum
                 If TotalSize >= Integer.MaxValue Then
                     BeginInvoke(Sub() ProgressBar1.Maximum = CInt(TotalSize / 1024))
                 Else
@@ -136,11 +136,11 @@ Public Class Form1
                 ' here, we extract every entry, but we could extract    
                 ' based on entry name, size, date, etc.   
                 For Each e_ In zip1
-                    BeginInvoke(Sub() lvStatus.Items(1).SubItems(1).Text = "Extrahiere Datei """ & e_.FileName & """...")
-                    BeginInvoke(Sub() lvStatus.Items(1).ToolTipText = "Extrahiere Datei """ & e_.FileName & """...")
+                    BeginInvoke(Sub() lvStatus.Items(1).SubItems(1).Text = "Extract file """ & e_.FileName & """...")
+                    BeginInvoke(Sub() lvStatus.Items(1).ToolTipText = "Extract file """ & e_.FileName & """...")
 
                     If File.Exists(TargetDir & "\" & e_.FileName.Replace("/", "\")) Then
-                        If MsgBox("Wollen Sie folgende Datei Überschreiben? """ & TargetDir & "\" & e_.FileName.Replace("/", "\") & """", MsgBoxStyle.YesNo, "Überschreiben") = MsgBoxResult.Yes Then
+                        If MsgBox("Do you want to overwrite the following file? """ & TargetDir & "\" & e_.FileName.Replace("/", "\") & """", MsgBoxStyle.YesNo, "Overwrite") = MsgBoxResult.Yes Then
                             e_.Extract(TargetDir, ExtractExistingFileAction.OverwriteSilently)
                         Else
 
@@ -151,8 +151,8 @@ Public Class Form1
 
                 Next
             End Using
-            BeginInvoke(Sub() lvStatus.Items(1).SubItems(1).Text = "Abgeschlossen.")
-            BeginInvoke(Sub() lvStatus.Items(2).SubItems(1).Text = """" & ZipToUnpack & """ Erfogreich Extrahiert.")
+            BeginInvoke(Sub() lvStatus.Items(1).SubItems(1).Text = "Done.")
+            BeginInvoke(Sub() lvStatus.Items(2).SubItems(1).Text = """" & ZipToUnpack & """ Successfully extracted.")
 
             BeginInvoke(Sub() GroupBox1.Enabled = True)
             BeginInvoke(Sub() GroupBox2.Enabled = True)
@@ -176,7 +176,7 @@ Public Class Form1
 
     Async Sub MyExtractProgress(ByVal sender As Object, ByVal e As ExtractProgressEventArgs)
         'if the reported BytesTransferred is greater than 0 then add the number of bytes that where transferred to the ExtractedSize variable
-        'and set the LastBtsTransfered to the number of bytes that have been transferred so far. Else reset the LastBtsTransfered to 0.
+        'and set the LastBtsTransfered to the number of bytes that have been transferred so far. Otherwise, reset the LastBtsTransfered to 0.
         If e.BytesTransferred > 0 Then
             ExtractedSize += CULng(e.BytesTransferred - LastBtsTransfered)
             LastBtsTransfered = CULng(e.BytesTransferred)
